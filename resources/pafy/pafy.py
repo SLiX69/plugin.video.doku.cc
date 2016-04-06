@@ -39,6 +39,7 @@ import json
 import logging
 import hashlib
 import tempfile
+import xbmc
 from xml.etree import ElementTree
 
 
@@ -193,7 +194,7 @@ def get_video_info(video_id, newurl=None):
 
     elif info['status'][0] == "fail":
         reason = info['reason'][0] or "Bad video argument"
-        raise IOError("Youtube says: %s [%s]" % (reason, video_id))
+        xbmc.executebuiltin("XBMC.Notification('Youtube says: %s [%s]' % (reason, video_id),2000)")
 
     return info
 
@@ -231,7 +232,7 @@ def extract_video_id(url):
             return vidid
 
     err = "Need 11 character video id or the URL of the video. Got %s"
-    raise ValueError(err % url)
+    xbmc.executebuiltin("XBMC.Notification( err % url,2000)")
 
 
 class g(object):
@@ -759,7 +760,7 @@ class Stream(object):
             filename = self.generate_filename(meta=meta)
 
         filepath = os.path.join(savedir, filename)
-        temp_filepath = filepath + ".temp"
+        temp_filepath = filepath
 
         status_string = ('  {:,} Bytes [{:.2%}] received. Rate: [{:4.0f} '
                          'KB/s].  ETA: [{:.0f} secs]')
