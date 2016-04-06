@@ -26,7 +26,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
-__version__ = "0.3.74"
+__version__ = "0.3.82"
 __author__ = "np1"
 __license__ = "LGPLv3"
 
@@ -39,7 +39,6 @@ import json
 import logging
 import hashlib
 import tempfile
-import xbmc
 from xml.etree import ElementTree
 
 
@@ -49,14 +48,17 @@ if sys.version_info[:2] >= (3, 0):
     # pylint: disable=E0611,F0401,I0011
     from urllib.request import build_opener
     from urllib.error import HTTPError, URLError
-    from urllib.parse import parse_qs, unquote_plus, urlencode
+    from urllib.parse import parse_qs, unquote_plus, urlencode, urlparse
     uni, pyver = str, 3
 
 else:
     from urllib2 import build_opener, HTTPError, URLError
     from urllib import unquote_plus, urlencode
-    from urlparse import parse_qs
+    from urlparse import parse_qs, urlparse
     uni, pyver = unicode, 2
+
+
+from .jsinterp import JSInterpreter
 
 
 if os.environ.get("pafydebug") == "1":
@@ -95,7 +97,7 @@ def fetch_decode(url, encoding=None):
             time.sleep(.5)
             return fetch_decode(url, encoding)
         else:
-            raise e
+            raise
 
     ct = req.headers['content-type']
 
@@ -112,8 +114,34 @@ def fetch_decode(url, encoding=None):
         return req.read()
 
 
+class GdataError(Exception):
+    """Gdata query failed."""
+    pass
+
+
+def call_gdata(api, qs):
+    """Make a request to the youtube gdata api."""
+    qs = dict(qs)
+    qs['key'] = g.api_key
+    url = g.urls['gdata'] + api + '?' + urlencode(qs)
+
+    try:
+        data = g.opener.open(url).read().decode()
+
+    except HTTPError as e:
+        try:
+            errdata = e.file.read().decode()
+            error = json.loads(errdata)['error']['message']
+            errmsg = 'Youtube Error %d: %s' % (e.getcode(), error)
+        except:
+            errmsg = str(e)
+        raise GdataError(errmsg)
+
+    return json.loads(data)
+
+
 def new(url, basic=True, gdata=False, signature=True, size=False,
-        callback=lambda x: None):
+        callback=None):
     """ Return a new pafy instance given a url or video id.
 
     NOTE: The signature argument has been deprecated and now has no effect,
@@ -165,8 +193,7 @@ def get_video_info(video_id, newurl=None):
 
     elif info['status'][0] == "fail":
         reason = info['reason'][0] or "Bad video argument"
-        #raise IOError("Youtube says: %s [%s]" % (reason, video_id))
-        xbmc.executebuiltin("XBMC.Notification('Youtube says: %s [%s]' % (reason, video_id),2000)")
+        raise IOError("Youtube says: %s [%s]" % (reason, video_id))
 
     return info
 
@@ -176,10 +203,8 @@ def get_video_gdata(video_id):
     new.callback("Fetching video gdata")
     query = {'part': 'id,snippet,statistics',
              'maxResults': 1,
-             'id': video_id,
-             'key': g.api_key}
-    url = g.urls['gdata'] + '?' + urlencode(query)
-    gdata = fetch_decode(url)  # unicode
+             'id': video_id}
+    gdata = call_gdata('videos', query)
     dbg("Fetched video gdata")
     new.callback("Fetched video gdata")
     return gdata
@@ -187,18 +212,26 @@ def get_video_gdata(video_id):
 
 def extract_video_id(url):
     """ Extract the video id from a url, return video id as str. """
-    ok = (r"\w-",) * 3
-    regx = re.compile(r'(?:^|[^%s]+)([%s]{11})(?:[^%s]+|$)' % ok)
+    idregx = re.compile(r'[\w-]{11}$')
     url = str(url)
-    m = regx.search(url)
 
-    if not m:
-        err = "Need 11 character video id or the URL of the video. Got %s"
-        raise ValueError(err % url)
-        xbmc.executebuiltin("XBMC.Notification( err % url,2000)")
+    if idregx.match(url):
+        return url # ID of video
 
-    vidid = m.group(1)
-    return vidid
+    if '://' not in url:
+        url = '//' + url
+    parsedurl = urlparse(url)
+    if parsedurl.netloc in ('youtube.com', 'www.youtube.com'):
+        query = parse_qs(parsedurl.query)
+        if 'v' in query and idregx.match(query['v'][0]):
+            return query['v'][0]
+    elif parsedurl.netloc in ('youtu.be', 'www.youtu.be'):
+        vidid = parsedurl.path.split('/')[-1] if parsedurl.path else ''
+        if idregx.match(vidid):
+            return vidid
+
+    err = "Need 11 character video id or the URL of the video. Got %s"
+    raise ValueError(err % url)
 
 
 class g(object):
@@ -206,9 +239,8 @@ class g(object):
     """ Class for holding constants needed throughout the module. """
 
     urls = {
-        'gdata': "https://www.googleapis.com/youtube/v3/videos",
+        'gdata': "https://www.googleapis.com/youtube/v3/",
         'watchv': "http://www.youtube.com/watch?v=%s",
-        'vidcat': "https://www.googleapis.com/youtube/v3/videoCategories",
         'vidinfo': ('http://www.youtube.com/get_video_info?'
                     'video_id=%s&asv=3&el=detailpage&hl=en_US'),
         'playlist': ('http://www.youtube.com/list_ajax?'
@@ -269,9 +301,9 @@ class g(object):
         '246': ('640x480', 'webm', 'video', 'VP9 high'),
         '247': ('720x480', 'webm', 'video', 'VP9'),
         '248': ('1920x1080', 'webm', 'video', 'VP9'),
-        '249': ('48k', 'ogg', 'audio', 'Opus'),
-        '250': ('56k', 'ogg', 'audio', 'Opus'),
-        '251': ('128k', 'ogg', 'audio', 'Opus'),
+        '249': ('48k', 'opus', 'audio', 'Opus'),
+        '250': ('56k', 'opus', 'audio', 'Opus'),
+        '251': ('128k', 'opus', 'audio', 'Opus'),
         '256': ('192k', 'm4a', 'audio', '6-channel'),
         '258': ('320k', 'm4a', 'audio', '6-channel'),
         '264': ('2560x1440', 'm4v', 'video', ''),
@@ -330,247 +362,24 @@ def _extract_dash(dashurl):
     return dashmap
 
 
-def _extract_function_from_js(name, js):
-    """ Find a function definition called `name` and extract components.
-
-    Return a dict representation of the function.
-
-    """
-    dbg("Extracting function '%s' from javascript", name)
-    fpattern = r'function\s+%s\(((?:\w+,?)+)\)\{([^}]+)\}'
-    m = re.search(fpattern % re.escape(name), js)
-    args, body = m.groups()
-    dbg("extracted function %s(%s){%s};", name, args, body)
-    func = {'name': name, 'parameters': args.split(","), 'body': body}
-    return func
-
-
-def _extract_dictfunc_from_js(name, js):
-    """ Find anonymous function from within a dict. """
-    dbg("Extracting function '%s' from javascript", name)
-    var, _, fname = name.partition(".")
-    fpattern = (r'var\s+%s\s*\=\s*\{.{,2000}?%s'
-                r'\:function\(((?:\w+,?)+)\)\{([^}]+)\}')
-    m = re.search(fpattern % (re.escape(var), re.escape(fname)), js)
-    args, body = m.groups()
-    dbg("extracted dict function %s(%s){%s};", name, args, body)
-    func = {'name': name, 'parameters': args.split(","), 'body': body}
-    return func
-
-
 def _get_mainfunc_from_js(js):
     """ Return main signature decryption function from javascript as dict. """
     dbg("Scanning js for main function.")
-    m = re.search(r'\w\.sig\|\|([$\w]+)\(\w+\.\w+\)', js)
+    m = re.search(r'\.sig\|\|([a-zA-Z0-9$]+)\(', js)
     funcname = m.group(1)
     dbg("Found main function: %s", funcname)
-    function = _extract_function_from_js(funcname, js)
-    return function
-
-
-def _get_other_funcs(primary_func, js):
-    """ Return all secondary functions used in primary_func. """
-    dbg("scanning javascript for secondary functions.")
-    body = primary_func['body']
-    body = body.split(";")
-    # standard function call; X=F(A,B,C...)
-    call = re.compile(r'(?:[$\w+])=([$\w]+)\(((?:\w+,?)+)\)$')
-
-    # dot notation function call; X=O.F(A,B,C..)
-    dotcall = re.compile(r'(?:[$\w+]=)?([$\w]+)\.([$\w]+)\(((?:\w+,?)+)\)$')
-
-    functions = {}
-
-    for part in body:
-
-        # is this a function?
-        if call.match(part):
-            match = call.match(part)
-            name = match.group(1)
-            # dbg("found secondary function '%s'", name)
-
-            if name not in functions:
-                # extract from javascript if not previously done
-                functions[name] = _extract_function_from_js(name, js)
-
-            # else:
-                # dbg("function '%s' is already in map.", name)
-        elif dotcall.match(part):
-
-            match = dotcall.match(part)
-            name = "%s.%s" % (match.group(1), match.group(2))
-
-            # don't treat X=A.slice(B) as X=O.F(B)
-            if match.group(2) in ["slice", "splice"]:
-                continue
-
-            if name not in functions:
-                functions[name] = _extract_dictfunc_from_js(name, js)
-
-    return functions
-
-
-def _getval(val, argsdict):
-    """ resolve variable values, preserve int literals. Return dict."""
-    m = re.match(r'(\d+)', val)
-
-    if m:
-        return int(m.group(1))
-
-    elif val in argsdict:
-        return argsdict[val]
-
-    else:
-        raise IOError("Error val %s from dict %s" % (val, argsdict))
-
-
-def _get_func_from_call(caller, name, arguments, js_url):
-    """
-    Return called function complete with called args given a caller function .
-
-    This function requires that Pafy.funcmap contains the function `name`.
-    It retrieves the function and fills in the parameter values as called in
-    the caller, returning them in the returned newfunction `args` dict
-
-    """
-    newfunction = Pafy.funcmap[js_url][name]
-    newfunction['args'] = {}
-
-    for n, arg in enumerate(arguments):
-        value = _getval(arg, caller['args'])
-
-        # function may not use all arguments
-        if n < len(newfunction['parameters']):
-            param = newfunction['parameters'][n]
-            newfunction['args'][param] = value
-
-    return newfunction
-
-
-def _solve(f, js_url, returns=True):
-    """Solve basic javascript function. Return solution value (str). """
-    # pylint: disable=R0914,R0912
-    resv = "slice|splice|reverse"
-    patterns = {
-        'split_or_join': r'(\w+)=\1\.(?:split|join)\(""\)$',
-        'func_call': r'(\w+)=([$\w]+)\(((?:\w+,?)+)\)$',
-        'x1': r'var\s(\w+)=(\w+)\[(\w+)\]$',
-        'x2': r'(\w+)\[(\w+)\]=(\w+)\[(\w+)\%(\w+)\.length\]$',
-        'x3': r'(\w+)\[(\w+)\]=(\w+)$',
-        'return': r'return (\w+)(\.join\(""\))?$',
-        'reverse': r'(\w+)=(\w+)\.reverse\(\)$',
-        'reverse_noass': r'(\w+)\.reverse\(\)$',
-        'return_reverse': r'return (\w+)\.reverse\(\)$',
-        'slice': r'(\w+)=(\w+)\.slice\((\w+)\)$',
-        'splice_noass': r'([$\w]+)\.splice\(([$\w]+)\,([$\w]+)\)$',
-        'return_slice': r'return (\w+)\.slice\((\w+)\)$',
-        'func_call_dict': r'(\w)=([$\w]+)\.(?!%s)([$\w]+)\(((?:\w+,?)+)\)$'
-                          % resv,
-        'func_call_dict_noret': r'([$\w]+)\.(?!%s)([$\w]+)\(((?:\w+,?)+)\)$'
-                                % resv
-    }
-
-    parts = f['body'].split(";")
-
-    for part in parts:
-        # dbg("Working on part: " + part)
-
-        name = ""
-
-        for n, p in patterns.items():
-            m, name = re.match(p, part), n
-
-            if m:
-                break
-        else:
-            raise IOError("no match for %s" % part)
-
-        if name == "split_or_join":
-            pass
-
-        elif name == "func_call_dict":
-            lhs, dic, key, args = m.group(1, 2, 3, 4)
-            funcname = "%s.%s" % (dic, key)
-            newfunc = _get_func_from_call(f, funcname, args.split(","), js_url)
-            f['args'][lhs] = _solve(newfunc, js_url)
-
-        elif name == "func_call_dict_noret":
-            dic, key, args = m.group(1, 2, 3)
-            funcname = "%s.%s" % (dic, key)
-            newfunc = _get_func_from_call(f, funcname, args.split(","), js_url)
-            changed_args = _solve(newfunc, js_url, returns=False)
-
-            for arg in f['args']:
-
-                if arg in changed_args:
-                    f['args'][arg] = changed_args[arg]
-
-        elif name == "func_call":
-            lhs, funcname, args = m.group(1, 2, 3)
-            newfunc = _get_func_from_call(f, funcname, args.split(","), js_url)
-            f['args'][lhs] = _solve(newfunc, js_url)  # recursive call
-
-        # new var is an index of another var; eg: var a = b[c]
-        elif name == "x1":
-            b, c = [_getval(x, f['args']) for x in m.group(2, 3)]
-            f['args'][m.group(1)] = b[c]
-
-        # a[b]=c[d%e.length]
-        elif name == "x2":
-            vals = m.group(*range(1, 6))
-            a, b, c, d, e = [_getval(x, f['args']) for x in vals]
-            f['args'][m.group(1)] = a[:b] + c[d % len(e)] + a[b + 1:]
-
-        # a[b]=c
-        elif name == "x3":
-            a, b, c = [_getval(x, f['args']) for x in m.group(1, 2, 3)]
-            f['args'][m.group(1)] = a[:b] + c + a[b + 1:]  # a[b] = c
-
-        elif name == "return":
-            return f['args'][m.group(1)]
-
-        elif name == "reverse":
-            f['args'][m.group(1)] = _getval(m.group(2), f['args'])[::-1]
-
-        elif name == "reverse_noass":
-            f['args'][m.group(1)] = _getval(m.group(1), f['args'])[::-1]
-
-        elif name == "splice_noass":
-            a, b, c = [_getval(x, f['args']) for x in m.group(1, 2, 3)]
-            f['args'][m.group(1)] = a[:b] + a[b + c:]
-
-        elif name == "return_reverse":
-            return f['args'][m.group(1)][::-1]
-
-        elif name == "return_slice":
-            a, b = [_getval(x, f['args']) for x in m.group(1, 2)]
-            return a[b:]
-
-        elif name == "slice":
-            a, b, c = [_getval(x, f['args']) for x in m.group(1, 2, 3)]
-            f['args'][m.group(1)] = b[c:]
-
-    if not returns:
-        # Return the args dict if no return statement in function
-        return f['args']
-
-    else:
-        raise IOError("Processed js funtion parts without finding return")
+    jsi = JSInterpreter(js)
+    return jsi.extract_function(funcname)
 
 
 def _decodesig(sig, js_url):
     """  Return decrypted sig given an encrypted sig and js_url key. """
     # lookup main function in Pafy.funcmap dict
-    mainfunction = Pafy.funcmap[js_url]['mainfunction']
-    param = mainfunction['parameters']
-
-    if not len(param) == 1:
-        raise IOError("Main sig js function has more than one arg: %s" % param)
+    mainfunction = Pafy.funcmap[js_url]
 
     # fill in function argument with signature
-    mainfunction['args'] = {param[0]: sig}
     new.callback("Decrypting signature")
-    solved = _solve(mainfunction, js_url)
+    solved = mainfunction([sig])
     dbg("Decrypted sig = %s...", solved[:30])
     new.callback("Decrypted signature")
     return solved
@@ -697,22 +506,20 @@ def get_js_sm(video_id):
     asm = _extract_smap(g.AF, stream_info, False)
     js_url = myjson['assets']['js']
     js_url = "https:" + js_url if js_url.startswith("//") else js_url
-    funcs = Pafy.funcmap.get(js_url)
+    mainfunc = Pafy.funcmap.get(js_url)
 
-    if not funcs:
+    if not mainfunc:
         dbg("Fetching javascript")
         new.callback("Fetching javascript")
         javascript = fetch_cached(js_url, encoding="utf8",
                                   dbg_ref="javascript", file_prefix="js-")
         mainfunc = _get_mainfunc_from_js(javascript)
-        funcs = _get_other_funcs(mainfunc, javascript)
-        funcs['mainfunction'] = mainfunc
 
-    elif funcs:
+    elif mainfunc:
         dbg("Using functions in memory extracted from %s", js_url)
         dbg("Mem contains %s js func sets", len(Pafy.funcmap))
 
-    return (sm, asm), js_url, funcs, dash_url
+    return (sm, asm), js_url, mainfunc, dash_url
 
 
 def _make_url(raw, sig, quick=True):
@@ -746,6 +553,9 @@ class Stream(object):
 
         self._mediatype = g.itags[self.itag][2]
         self._threed = 'stereo3d' in sm and sm['stereo3d'] == '1'
+
+        # It will be None by default, for non-audio streams
+        self._rawbitrate = None
 
         if is_dash:
 
@@ -949,7 +759,7 @@ class Stream(object):
             filename = self.generate_filename(meta=meta)
 
         filepath = os.path.join(savedir, filename)
-        temp_filepath = filepath #+ ".temp" #+ ".temp"
+        temp_filepath = filepath + ".temp"
 
         status_string = ('  {:,} Bytes [{:.2%}] received. Rate: [{:4.0f} '
                          'KB/s].  ETA: [{:.0f} secs]')
@@ -988,7 +798,7 @@ class Stream(object):
             elapsed = time.time() - t0
             bytesdone += len(chunk)
             if elapsed:
-                rate = ((bytesdone - offset) / 1024) / elapsed
+                rate = ((float(bytesdone) - float(offset)) / 1024.0) / elapsed
                 eta = (total - bytesdone) / (rate * 1024)
             else: # Avoid ZeroDivisionError
                 rate = 0
@@ -1029,13 +839,13 @@ class Pafy(object):
     funcmap = {}  # keep functions as a class variable
 
     def __init__(self, video_url, basic=True, gdata=False,
-                 signature=True, size=False, callback=lambda x: None):
+                 signature=True, size=False, callback=None):
         """ Set initial values. """
         self.version = __version__
         self.videoid = extract_video_id(video_url)
         self.watchv_url = g.urls['watchv'] % self.videoid
 
-        new.callback = callback
+        new.callback = callback or (lambda x: None)
         self._have_basic = False
         self._have_gdata = False
 
@@ -1073,7 +883,6 @@ class Pafy(object):
         self._bigthumbhd = None
         self._mix_pl = None
         self.expiry = None
-        self.playlist_meta = None
 
         if basic:
             self.fetch_basic()
@@ -1102,8 +911,8 @@ class Pafy(object):
             dbg("Encrypted signature detected.")
 
             if not self.age_ver:
-                smaps, js_url, funcs, dashurl = get_js_sm(self.videoid)
-                Pafy.funcmap[js_url] = funcs
+                smaps, js_url, mainfunc, dashurl = get_js_sm(self.videoid)
+                Pafy.funcmap[js_url] = mainfunc
                 self.sm, self.asm = smaps
                 self.js_url = js_url
                 dashsig = re.search(r"/s/([\w\.]+)", dashurl).group(1)
@@ -1159,8 +968,7 @@ class Pafy(object):
         if self._have_gdata:
             return
 
-        gdata = get_video_gdata(self.videoid)
-        item = json.loads(gdata)['items'][0]
+        item = get_video_gdata(self.videoid)['items'][0]
         snippet = item['snippet']
         self._published = uni(snippet['publishedAt'])
         self._description = uni(snippet["description"])
@@ -1462,7 +1270,6 @@ class Pafy(object):
         self._viewcount = int(self._viewcount)
         self._thumb = pl_data.get("thumbnail")
         self._description = pl_data.get("description")
-        self.playlist_meta = pl_data
 
 
 def get_categoryname(cat_id):
@@ -1473,12 +1280,9 @@ def get_categoryname(cat_id):
     if cached.get('updated', 0) > timestamp - g.lifespan:
         return cached.get('title', 'unknown')
     # call videoCategories API endpoint to retrieve title
-    url = g.urls['vidcat']
     query = {'id': cat_id,
-             'part': 'snippet',
-             'key': g.api_key}
-    url += "?" + urlencode(query)
-    catinfo = json.loads(fetch_decode(url))
+             'part': 'snippet'}
+    catinfo = call_gdata('videoCategories', query)
     try:
         for item in catinfo.get('items', []):
             title = item.get('snippet', {}).get('title', 'unknown')
@@ -1500,12 +1304,9 @@ def set_categories(categories):
     idlist = [cid for cid, item in categories.items()
               if item.get('updated', 0) < timestamp - g.lifespan]
     if len(idlist) > 0:
-        url = g.urls['vidcat']
         query = {'id': ','.join(idlist),
-                 'part': 'snippet',
-                 'key': g.api_key}
-        url += "?" + urlencode(query)
-        catinfo = json.loads(fetch_decode(url))
+                 'part': 'snippet'}
+        catinfo = call_gdata('videoCategories', query)
         try:
             for item in catinfo.get('items', []):
                 cid = item['id']
@@ -1526,6 +1327,25 @@ def dump_cache():
     return g.cache
 
 
+def extract_playlist_id(playlist_url):
+    # Normal playlists start with PL, Mixes start with RD + first video ID
+    idregx = re.compile(r'((?:RD|PL)[-_0-9a-zA-Z]+)$')
+
+    playlist_id = None
+    if idregx.match(playlist_url):
+        playlist_id = playlist_url # ID of video
+
+    if '://' not in playlist_url:
+        playlist_url = '//' + playlist_url
+    parsedurl = urlparse(playlist_url)
+    if parsedurl.netloc in ('youtube.com', 'www.youtube.com'):
+        query = parse_qs(parsedurl.query)
+        if 'list' in query and idregx.match(query['list'][0]):
+            playlist_id = query['list'][0]
+
+    return playlist_id
+
+
 def get_playlist(playlist_url, basic=False, gdata=False, signature=True,
                  size=False, callback=lambda x: None):
     """ Return a dict containing Pafy objects from a YouTube Playlist.
@@ -1534,26 +1354,17 @@ def get_playlist(playlist_url, basic=False, gdata=False, signature=True,
     get_playlist() in the manner documented for pafy.new()
 
     """
-    # pylint: disable=R0914
-    # too many local vars
 
-    # Normal playlists start with PL, Mixes start with RD + first video ID
-    regx = re.compile(r'((?:RD|PL)[-_0-9a-zA-Z]+)')
-    m = regx.search(playlist_url)
+    playlist_id = extract_playlist_id(playlist_url)
 
-    if not m:
+    if not playlist_id:
         err = "Unrecognized playlist url: %s"
         raise ValueError(err % playlist_url)
 
-    playlist_id = m.group(1)
     url = g.urls["playlist"] % playlist_id
 
-    try:
-        allinfo = fetch_decode(url)  # unicode
-        allinfo = json.loads(allinfo)
-
-    except:
-        raise IOError("Error fetching playlist %s" % m.groups(0))
+    allinfo = fetch_decode(url)  # unicode
+    allinfo = json.loads(allinfo)
 
     # playlist specific metadata
     playlist = dict(
@@ -1614,6 +1425,125 @@ def get_playlist(playlist_url, basic=False, gdata=False, signature=True,
         callback("Added video: %s" % v['title'])
 
     return playlist
+
+
+def parseISO8591(duration):
+    """ Parse ISO 8591 formated duration """
+    regex = re.compile(r'PT((\d{1,3})H)?((\d{1,3})M)?((\d{1,2})S)?')
+    if duration:
+        duration = regex.findall(duration)
+        if len(duration) > 0:
+            _, hours, _, minutes, _, seconds = duration[0]
+            duration = [seconds, minutes, hours]
+            duration = [int(v) if len(v) > 0 else 0 for v in duration]
+            duration = sum([60**p*v for p, v in enumerate(duration)])
+        else:
+            duration = 30
+    else:
+        duration = 30
+    return duration
+
+
+class Playlist(object):
+    _items = None
+
+    def __init__(self, playlist_url, basic, gdata, signature, size, callback):
+        playlist_id = extract_playlist_id(playlist_url)
+
+        if not playlist_id:
+            err = "Unrecognized playlist url: %s"
+            raise ValueError(err % playlist_url)
+
+        query = {'part': 'snippet, contentDetails',
+                'id': playlist_id}
+        allinfo = call_gdata('playlists', query)
+
+        pl = allinfo['items'][0]
+
+        self.plid = playlist_id
+        self.title = pl['snippet']['title']
+        self.author = pl['snippet']['channelTitle']
+        self.description = pl['snippet']['description']
+        self ._len = pl['contentDetails']['itemCount']
+        self._basic = basic
+        self._gdata = gdata
+        self._signature = signature
+        self._size = size
+        self._callback = callback
+
+    def __len__(self):
+        return self._len
+    
+    def __iter__(self):
+        if self._items is not None:
+            for  i in self._items:
+                yield i
+            return
+
+        items = []
+
+        # playlist items specific metadata
+        query = {'part': 'snippet',
+                'maxResults': 50,
+                'playlistId': self.plid}
+
+        while True:
+            playlistitems = call_gdata('playlistItems', query)
+
+            query2 = {'part':'contentDetails,snippet,statistics',
+                      'maxResults': 50,
+                      'id': ','.join(i['snippet']['resourceId']['videoId']
+                          for i in playlistitems['items'])}
+            wdata = call_gdata('videos', query2)
+
+            for v, vextra in zip(playlistitems['items'], wdata['items']):
+                vid_data = dict(
+                    title=v['snippet']['title'],
+                    author=v['snippet']['channelTitle'],
+                    thumbnail=v['snippet'].get('thumbnails', {}
+                        ).get('default', {}).get('url'),
+                    description=v['snippet']['description'],
+                    length_seconds=parseISO8591(
+                        vextra['contentDetails']['duration']),
+                    category=get_categoryname(vextra['snippet']['categoryId']),
+                    views=vextra['statistics'].get('viewCount',0),
+                    likes=vextra['statistics'].get('likeCount',0),
+                    dislikes=vextra['statistics'].get('dislikeCount',0),
+                    comments=vextra['statistics'].get('commentCount',0),
+                )
+
+                try:
+                    pafy_obj = new(v['snippet']['resourceId']['videoId'],
+                            basic=self._basic, gdata=self._gdata,
+                            signature=self._signature, size=self._size,
+                            callback=self._callback)
+
+                except IOError as e:
+                    self.callback("%s: %s" % (v['title'], e.message))
+                    continue
+
+                pafy_obj.populate_from_playlist(vid_data)
+                items.append(pafy_obj)
+                self._callback("Added video: %s" % vid_data['title'])
+                yield pafy_obj
+
+            if not playlistitems.get('nextPageToken'):
+                break
+            query['pageToken'] = playlistitems['nextPageToken']
+
+        self._items = items
+
+
+def get_playlist2(playlist_url, basic=False, gdata=False, signature=True,
+                 size=False, callback=lambda x: None):
+    """ Return a Playlist object from a YouTube Playlist.
+
+    The returned Pafy objects are initialised using the arguments to
+    get_playlist() in the manner documented for pafy.new()
+
+    """
+
+    return Playlist(playlist_url, basic, gdata, signature, size, callback)
 
 
 def set_api_key(key):
