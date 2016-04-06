@@ -1,0 +1,4 @@
+change line 950 from temp_filepath = filepath #+ ".temp" to temp_filepath = filepath  for delet the temp extension from download
+change line 167 from raise IOError("Youtube says: %s [%s]" % (reason, video_id)) to  xbmc.executebuiltin("XBMC.Notification('Youtube says: %s [%s]' % (reason, video_id),2000)") switch errorhandling to xbmc
+change line 197 from raise ValueError(err % url) to xbmc.executebuiltin("XBMC.Notification( err % url,2000)") switch errorhandling to xbmc
+add import xbmc 
