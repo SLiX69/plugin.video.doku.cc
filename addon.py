@@ -82,9 +82,13 @@ def index(url):
 
 
 def play(url):
-    video_url = ((pafy.new(url)).getbest()).url
-    listitem = xbmcgui.ListItem(path=video_url)
-    xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
+    try:
+        video_url = ((pafy.new(url)).getbest()).url
+        listitem = xbmcgui.ListItem(path=video_url)
+        xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
+    except ValueError:
+        pass
+        # xbmc.executebuiltin("XBMC.Notification(Doku.cc, Video not available!, 2000, %s)" % icon)
 
 
 def Search():
