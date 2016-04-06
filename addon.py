@@ -121,13 +121,13 @@ def Download(url):
         d.ok('Download Error', 'Du hast keinen Download Folder gesetzt', '', '')
         addon.openSettings(sys.argv[0])
         return
-    xbmc.executebuiltin('XBMC.Notification(Doku.cc,Starte Download)')
+    xbmc.executebuiltin('XBMC.Notification(Doku.cc, Starte Download, 1000, %s)' % icon)
     name = (pafy.new(url)).title
     best = (pafy.new(url)).getbest()
     filepath = downloadpath + name + '.' + best.extension
     filepath = (filepath).replace('.temp', '')
     best.download(filepath).replace('.temp', '')
-    xbmc.executebuiltin("XBMC.Notification(Download beendet!,2000)")
+    xbmc.executebuiltin('XBMC.Notification(Doku.cc, Download beendet, 4000, %s)' % icon)
 
 
 def listing():
