@@ -15,6 +15,7 @@ imageDir = os.path.join(home, 'thumbnails') + '/'
 view_mode_id = int('503')
 xbox = xbmc.getCondVisibility("System.Platform.xbox")
 downloadpath = addon.getSetting('download_path')
+show_doku_src = 'True'
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku.cc//api.php?'
 
@@ -66,8 +67,9 @@ def index(url):
         thumb = item['cover']
         duration = item['length']
         date = cleandate(item['date'])
-        desc = '%s       %s %s  bei  %s   Votes\n%s' % (
-        date, item['voting']['voteCountInPerc'], '%', item['voting']['voteCountAll'], item['description'])
+        source = get_item_src(item['dokuSrc'])
+        desc = '%s       %s %s  bei  %s  Votes       %s\n%s' % (
+        date, item['voting']['voteCountInPerc'], '%', item['voting']['voteCountAll'], source, item['description'])
         addLink(name, url, 'play', thumb, desc, duration)
     try:
         url = (data['query']['nextpage'])
@@ -148,6 +150,17 @@ def cleandate(date):
     date = date.split(' ', 1)[0]
     date = '%s.%s.%s' % (date.split('-')[2], date.split('-')[1], date.split('-')[0])
     return date
+
+
+def get_item_src(source):
+    if show_doku_src == 'True':
+        if source.upper() != 'PROGRAMM' and len(source) > 2:
+            if len(source) > 10:
+                source = source[0:10]
+            source = 'von: ' + source
+        else:
+            source = ''
+    return source
 
 
 def getjson(url):
