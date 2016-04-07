@@ -15,7 +15,7 @@ imageDir = os.path.join(home, 'thumbnails') + '/'
 view_mode_id = int('503')
 xbox = xbmc.getCondVisibility("System.Platform.xbox")
 downloadpath = addon.getSetting('download_path')
-show_doku_src = 'True'
+show_doku_src = addon.getSetting('show_doku_source')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku.cc//api.php?'
 
@@ -153,13 +153,15 @@ def cleandate(date):
 
 
 def get_item_src(source):
-    if show_doku_src == 'True':
+    if show_doku_src == 'true':
         if source.upper() != 'PROGRAMM' and len(source) > 2:
             if len(source) > 10:
                 source = source[0:10]
             source = 'von: ' + source
         else:
             source = ''
+    else:
+        source = ''
     return source
 
 
