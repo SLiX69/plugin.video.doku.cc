@@ -189,7 +189,7 @@ def get_item_perc(perc):
 
 def get_item_vote(vote):
     if vote == 1:
-        vote = str(vote) + '    Vote '
+        vote = str(vote) + '    Vote  '
     elif vote < 10:
         vote = str(vote) + '    Votes'
     elif vote != 100:
