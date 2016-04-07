@@ -79,8 +79,9 @@ def index(url):
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
-        desc = '%s      %s  bei  %s  Votes       %s\n%s' % (
-        date, perc, item['voting']['voteCountAll'], source, desc)
+        vote = get_item_vote(item['voting']['voteCountAll'])
+        desc = '%s      %s  bei  %s       %s\n%s' % (
+        date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
         url = (data['query']['nextpage'])
@@ -184,6 +185,18 @@ def get_item_perc(perc):
     else:
         perc = str(perc) + '%'
     return perc
+
+
+def get_item_vote(vote):
+    if vote == 1:
+        vote = str(vote) + '    Vote '
+    elif vote < 10:
+        vote = str(vote) + '    Votes'
+    elif vote != 100:
+        vote = str(vote) + '  Votes'
+    else:
+        vote = str(vote) + 'Votes'
+    return vote
 
 
 def getjson(url):
