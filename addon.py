@@ -69,7 +69,7 @@ def index(url):
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
         desc = '%s       %s %s  bei  %s  Votes       %s\n%s' % (
-        date, item['voting']['voteCountInPerc'], '%', item['voting']['voteCountAll'], source, item['description'])
+        date, item['voting']['voteCountInPerc'], '%', item['voting']['voteCountAll'], source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
         url = (data['query']['nextpage'])
