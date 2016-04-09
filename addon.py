@@ -15,9 +15,20 @@ imageDir = os.path.join(home, 'thumbnails') + '/'
 view_mode_id = int('503')
 xbox = xbmc.getCondVisibility("System.Platform.xbox")
 downloadpath = addon.getSetting('download_path')
-show_doku_src = 'True'
+show_doku_src = addon.getSetting('show_doku_source')
+show_menu_search = addon.getSetting('show_menu_search')
+show_menu_cats = addon.getSetting('show_menu_cats')
+show_menu_abc = addon.getSetting('show_menu_abc')
+show_menu_dl = addon.getSetting('show_menu_dl')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku.cc//api.php?'
+
+dis_genre = []
+if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
+if addon.getSetting('show_menu_reup') == 'false': dis_genre.append('Die neusten reUploads')
+if addon.getSetting('show_menu_week') == 'false': dis_genre.append('Aufsteiger der Woche')
+if addon.getSetting('show_menu_month') == 'false': dis_genre.append('Top Dokus des Monats')
+if addon.getSetting('show_menu_year') == 'false': dis_genre.append('Top Dokus des Jahres')
 
 
 def categories():
@@ -26,14 +37,13 @@ def categories():
         url = genre['url']
         name = genre['genre']
         icon = genre['thumb']
+        if name in dis_genre:
+            continue
         addDir(name, url, 'index', icon)
-    addDir('Suche', '', 'Search', imageDir + '6.png')
-    addDir('Kategorien', '', 'getcat', imageDir + '7.png')
-    addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
-    if downloadpath is '':
-        pass
-    else:
-        addDir('meine Downloads', '', 'listing', imageDir + '9.png')
+    if show_menu_search == 'true': addDir('Suche', '', 'Search', imageDir + '6.png')
+    if show_menu_cats == 'true': addDir('Kategorien', '', 'getcat', imageDir + '7.png')
+    if show_menu_abc == 'true': addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
+    if show_menu_dl == 'true': addDir('meine Downloads', '', 'listing', imageDir + '9.png')
 
 
 def get_genres():
@@ -153,13 +163,15 @@ def cleandate(date):
 
 
 def get_item_src(source):
-    if show_doku_src == 'True':
+    if show_doku_src == 'true':
         if source.upper() != 'PROGRAMM' and len(source) > 2:
             if len(source) > 10:
                 source = source[0:10]
             source = 'von: ' + source
         else:
             source = ''
+    else:
+        source = ''
     return source
 
 

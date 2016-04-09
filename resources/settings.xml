@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-   <setting id="download_path" type="folder" label="Download Verzeichnis" default=""/>
+	<category label="Allgemein">
+		<setting label="Download Verzeichnis" type="folder" id="download_path" default=""/>
+		<setting label="Zeige Doku-Quelle in Beschreibung" type="bool" id="show_doku_source" default="true"/>
+	</category>
+	<category label="Menü">
+		<setting label="Zeige 'Die neuesten Dokus'" type="bool" id="show_menu_new" default="true"/>
+		<setting label="Zeige 'Die neuesten reUploads'" type="bool" id="show_menu_reup" default="true"/>
+		<setting label="Zeige 'Aufsteiger der Woche'" type="bool" id="show_menu_week" default="true"/>
+		<setting label="Zeige 'Top Dokus des Monats'" type="bool" id="show_menu_month" default="true"/>
+		<setting label="Zeige 'Top Dokus des Jahres'" type="bool" id="show_menu_year" default="true"/>
+		<setting label="Zeige 'Suche'" type="bool" id="show_menu_search" default="true"/>
+		<setting label="Zeige 'Kategorien'" type="bool" id="show_menu_cats" default="true"/>
+		<setting label="Zeige 'A-Z'" type="bool" id="show_menu_abc" default="true"/>
+		<setting label="Zeige 'meine Downloads'" type="bool" id="show_menu_dl" default="true"/>
+	</category>
 </settings>
