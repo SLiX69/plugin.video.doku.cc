@@ -23,6 +23,8 @@ show_menu_dl = addon.getSetting('show_menu_dl')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku.cc//api.php?'
 
+if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
+
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
 if addon.getSetting('show_menu_reup') == 'false': dis_genre.append('Die neusten reUploads')
