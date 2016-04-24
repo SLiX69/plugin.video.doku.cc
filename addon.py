@@ -23,6 +23,8 @@ show_menu_dl = addon.getSetting('show_menu_dl')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku.cc//api.php?'
 
+if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
+
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
 if addon.getSetting('show_menu_reup') == 'false': dis_genre.append('Die neusten reUploads')
@@ -78,8 +80,10 @@ def index(url):
         duration = item['length']
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
-        desc = '%s       %s %s  bei  %s  Votes       %s\n%s' % (
-        date, item['voting']['voteCountInPerc'], '%', item['voting']['voteCountAll'], source, desc)
+        perc = get_item_perc(item['voting']['voteCountInPerc'])
+        vote = get_item_vote(item['voting']['voteCountAll'])
+        desc = '%s      %s  bei  %s       %s\n%s' % (
+        date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
         url = (data['query']['nextpage'])
@@ -173,6 +177,28 @@ def get_item_src(source):
     else:
         source = ''
     return source
+
+
+def get_item_perc(perc):
+    if perc < 10:
+        perc = str(perc) + '    %'
+    elif perc != 100:
+        perc = str(perc) + '  %'
+    else:
+        perc = str(perc) + '%'
+    return perc
+
+
+def get_item_vote(vote):
+    if vote == 1:
+        vote = str(vote) + '    Vote  '
+    elif vote < 10:
+        vote = str(vote) + '    Votes'
+    elif vote != 100:
+        vote = str(vote) + '  Votes'
+    else:
+        vote = str(vote) + 'Votes'
+    return vote
 
 
 def getjson(url):
