@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.doku5.com" name="Doku5" version="0.0.3" provider-name="skatulskijean/SLiX">
+<addon id="plugin.video.doku5.com" name="Doku5.com" version="0.1.0" provider-name="skatulskijean/SLiX">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
 		<import addon="script.module.requests" version="2.7.0"/>
