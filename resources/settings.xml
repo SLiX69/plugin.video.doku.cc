@@ -6,6 +6,7 @@
 		<setting label="Zeige Fanart" type="bool" id="show_doku_fanart" default="true"/>
 		<setting type="sep"/>
 		<setting label="Ändere ViewID" type="bool" id="change_view" default="false"/>
+		<setting label="ViewID Episoden" type="number" id="change_view_episodes" enable="eq(-1,true)" default="503"/>
 	</category>
 	<category label="Menü">
 		<setting label="Zeige 'Die neuesten Dokus'" type="bool" id="show_menu_new" default="true"/>
