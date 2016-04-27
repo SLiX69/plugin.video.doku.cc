@@ -14,6 +14,6 @@
 		<setting label="Zeige 'Suche'" type="bool" id="show_menu_search" default="true"/>
 		<setting label="Zeige 'Kategorien'" type="bool" id="show_menu_cats" default="true"/>
 		<setting label="Zeige 'A-Z'" type="bool" id="show_menu_abc" default="true"/>
-		<setting label="Zeige 'meine Downloads'" type="bool" id="show_menu_dl" default="true"/>
+		<setting label="Zeige 'meine Downloads'" type="bool" id="show_menu_dl" default="false"/>
 	</category>
 </settings>
