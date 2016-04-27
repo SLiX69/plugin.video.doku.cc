@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import re, xbmcplugin, xbmcgui, requests
 import xbmc
 import xbmcaddon
@@ -7,7 +10,8 @@ from urllib import quote, unquote_plus, unquote, urlencode, quote_plus, urlretri
 from resources import pafy
 
 pluginhandle = int(sys.argv[1])
-addon = xbmcaddon.Addon(id='plugin.video.doku.cc')
+title = 'Doku5'
+addon = xbmcaddon.Addon(id='plugin.video.doku5.com')
 home = addon.getAddonInfo('path').decode('utf-8')
 icon = xbmc.translatePath(os.path.join(home, 'icon.png'))
 fanart = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
@@ -21,9 +25,11 @@ show_menu_cats = addon.getSetting('show_menu_cats')
 show_menu_abc = addon.getSetting('show_menu_abc')
 show_menu_dl = addon.getSetting('show_menu_dl')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
-baseurl = 'http://doku.cc//api.php?'
+baseurl = 'http://doku5.com//api.php?'
 
 if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
+if addon.getSetting('change_view') == 'true': view_mode_id = int(addon.getSetting('change_view_episodes'))
+if addon.getSetting('show_main_menu_folder') == 'true': show_mm = True
 
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
@@ -93,6 +99,7 @@ def index(url):
     try:
         url = (data['query']['prevpage'])
         addDir('Prev', url, 'index', imageDir + '11.png')
+        if show_mm: addDir('Hauptmenü', '', '', '')
     except:
         pass
 
@@ -104,7 +111,7 @@ def play(url):
         xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
     except ValueError:
         pass
-        # xbmc.executebuiltin("XBMC.Notification(Doku.cc, Video not available!, 2000, %s)" % icon)
+        # xbmc.executebuiltin("XBMC.Notification(%s, Video not available!, 2000, %s)" % (title, icon))
 
 
 def Search():
@@ -115,7 +122,7 @@ def Search():
 
 def search():
     search_entered = ''
-    keyboard = xbmc.Keyboard(search_entered, 'Suche auf Doku.cc')
+    keyboard = xbmc.Keyboard(search_entered, 'Suche auf %s' % title)
     keyboard.doModal()
     if keyboard.isConfirmed():
         search_entered = keyboard.getText()
@@ -134,16 +141,16 @@ def Alphabet():
 def Download(url):
     if downloadpath is '':
         d = xbmcgui.Dialog()
-        d.ok('Download Error', 'Du hast keinen Download Folder gesetzt', '', '')
+        d.ok(title, 'Du hast keinen Download Folder gesetzt', '', '')
         addon.openSettings(sys.argv[0])
         return
-    xbmc.executebuiltin('XBMC.Notification(Doku.cc, Starte Download, 1000, %s)' % icon)
+    xbmc.executebuiltin('XBMC.Notification(%s, Starte Download, 1000, %s)' % (title, icon))
     name = (pafy.new(url)).title
     best = (pafy.new(url)).getbest()
     filepath = downloadpath + name + '.' + best.extension
     filepath = (filepath).replace('.temp', '')
     best.download(filepath).replace('.temp', '')
-    xbmc.executebuiltin('XBMC.Notification(Doku.cc, Download beendet, 4000, %s)' % icon)
+    xbmc.executebuiltin('XBMC.Notification(%s, Download beendet, 4000, %s)' % (title, icon))
 
 
 def listing():
