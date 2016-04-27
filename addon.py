@@ -25,6 +25,7 @@ xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku5.com//api.php?'
 
 if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
+if addon.getSetting('change_view') == 'true': view_mode_id = int(addon.getSetting('change_view_episodes'))
 
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
