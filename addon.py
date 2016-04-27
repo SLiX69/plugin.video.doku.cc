@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import re, xbmcplugin, xbmcgui, requests
 import xbmc
 import xbmcaddon
@@ -26,6 +29,7 @@ baseurl = 'http://doku5.com//api.php?'
 
 if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
 if addon.getSetting('change_view') == 'true': view_mode_id = int(addon.getSetting('change_view_episodes'))
+if addon.getSetting('show_main_menu_folder') == 'true': show_mm = True
 
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
@@ -95,6 +99,7 @@ def index(url):
     try:
         url = (data['query']['prevpage'])
         addDir('Prev', url, 'index', imageDir + '11.png')
+        if show_mm: addDir('Hauptmenü', '', '', '')
     except:
         pass
 
