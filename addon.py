@@ -88,7 +88,7 @@ def index(url):
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
         vote = get_item_vote(item['voting']['voteCountAll'])
-        desc = '%s      %s  bei  %s       %s\n%s' % (
+        desc = '%s       %s  bei  %s \n%s\n%s' % (
         date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
@@ -176,8 +176,8 @@ def cleandate(date):
 def get_item_src(source):
     if show_doku_src == 'true':
         if source.upper() != 'PROGRAMM' and len(source) > 2:
-            if len(source) > 10:
-                source = source[0:10]
+            if len(source) > 15:
+                source = source[0:14]
             source = 'von: ' + source
         else:
             source = ''
