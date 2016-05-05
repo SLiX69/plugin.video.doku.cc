@@ -106,7 +106,7 @@ def index(url):
 
 def play(url):
     try:
-        video_url = ((pafy.new(url)).getbest()).url
+        video_url = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid="+url
         listitem = xbmcgui.ListItem(path=video_url)
         xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
     except ValueError:
