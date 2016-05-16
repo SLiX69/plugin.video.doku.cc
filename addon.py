@@ -7,7 +7,7 @@ import xbmcaddon
 import os
 import urlparse
 from urllib import quote, unquote_plus, unquote, urlencode, quote_plus, urlretrieve
-from resources import pafy
+
 
 pluginhandle = int(sys.argv[1])
 title = 'Doku5'
