@@ -82,7 +82,7 @@ def index(url):
         url = item['youtubeId']
         desc = item['description']
         name = item['title']
-        thumb = item['thumb'].replace('thumb', 'p_images')
+        thumb = item['cover']
         duration = item['length']
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
