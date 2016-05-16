@@ -26,10 +26,13 @@ show_menu_abc = addon.getSetting('show_menu_abc')
 show_menu_dl = addon.getSetting('show_menu_dl')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku5.com//api.php?'
+change_view = False
 
 if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
-if addon.getSetting('change_view') == 'true': view_mode_id = int(addon.getSetting('change_view_episodes'))
 if addon.getSetting('show_main_menu_folder') == 'true': show_mm = True
+if addon.getSetting('change_view') == 'true':
+    change_view = True
+    view_mode_id = int(addon.getSetting('change_view_episodes'))
 
 dis_genre = []
 if addon.getSetting('show_menu_new') == 'false': dis_genre.append('Die neusten Dokus')
@@ -52,6 +55,9 @@ def categories():
     if show_menu_cats == 'true': addDir('Kategorien', '', 'getcat', imageDir + '7.png')
     if show_menu_abc == 'true': addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
     if show_menu_dl == 'true': addDir('meine Downloads', '', 'listing', imageDir + '9.png')
+    xbmcplugin.endOfDirectory(pluginhandle)
+    if change_view:
+        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 
 def get_genres():
@@ -74,6 +80,9 @@ def getcat():
         name = item['name']
         url = item['url']
         addDir(name, url, 'index', icon)
+    xbmcplugin.endOfDirectory(pluginhandle)
+    if change_view:
+        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 
 def index(url):
@@ -102,6 +111,9 @@ def index(url):
         if show_mm: addDir('Hauptmenü', '', '', '')
     except:
         pass
+    xbmcplugin.endOfDirectory(pluginhandle)
+    if change_view:
+        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 
 def play(url):
@@ -136,6 +148,9 @@ def Alphabet():
         name = chr(i)
         url = '%sletter=%s&page=1' % (baseurl, name)
         addDir(name, url, 'index', icon)
+    xbmcplugin.endOfDirectory(pluginhandle)
+    if change_view:
+        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 
 def Download(url):
@@ -275,4 +290,3 @@ elif mode == '59':
 else:
     categories()
 
-xbmcplugin.endOfDirectory(pluginhandle)
