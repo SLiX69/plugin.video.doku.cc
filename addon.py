@@ -17,13 +17,11 @@ icon = xbmc.translatePath(os.path.join(home, 'icon.png'))
 fanart = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
 imageDir = os.path.join(home, 'thumbnails') + '/'
 view_mode_id = int('503')
-xbox = xbmc.getCondVisibility("System.Platform.xbox")
-downloadpath = addon.getSetting('download_path')
 show_doku_src = addon.getSetting('show_doku_source')
 show_menu_search = addon.getSetting('show_menu_search')
 show_menu_cats = addon.getSetting('show_menu_cats')
 show_menu_abc = addon.getSetting('show_menu_abc')
-show_menu_dl = addon.getSetting('show_menu_dl')
+
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku5.com//api.php?'
 change_view = False
@@ -54,7 +52,6 @@ def categories():
     if show_menu_search == 'true': addDir('Suche', '', 'Search', imageDir + '6.png')
     if show_menu_cats == 'true': addDir('Kategorien', '', 'getcat', imageDir + '7.png')
     if show_menu_abc == 'true': addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
-    if show_menu_dl == 'true': addDir('meine Downloads', '', 'listing', imageDir + '9.png')
     xbmcplugin.endOfDirectory(pluginhandle)
     if change_view:
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
@@ -153,35 +150,6 @@ def Alphabet():
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 
-def Download(url):
-    if downloadpath is '':
-        d = xbmcgui.Dialog()
-        d.ok(title, 'Du hast keinen Download Folder gesetzt', '', '')
-        addon.openSettings(sys.argv[0])
-        return
-    xbmc.executebuiltin('XBMC.Notification(%s, Starte Download, 1000, %s)' % (title, icon))
-    name = (pafy.new(url)).title
-    best = (pafy.new(url)).getbest()
-    filepath = downloadpath + name + '.' + best.extension
-    filepath = (filepath).replace('.temp', '')
-    best.download(filepath).replace('.temp', '')
-    xbmc.executebuiltin('XBMC.Notification(%s, Download beendet, 4000, %s)' % (title, icon))
-
-
-def listing():
-    dirs = os.listdir(downloadpath)
-    for url in dirs:
-        url = downloadpath + url
-        name = (url).replace(downloadpath, '')
-        addLink(name, url, 'play1', icon, '', '')
-
-
-def play1(url):
-    videolink = str(url)
-    listitem = xbmcgui.ListItem(path=videolink)
-    xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
-
-
 def cleandate(date):
     date = date.split(' ', 1)[0]
     date = '%s.%s.%s' % (date.split('-')[2], date.split('-')[1], date.split('-')[0])
@@ -237,7 +205,6 @@ def addLink(name, url, mode, iconimage, desc, duration):
     item.setInfo(type="Video", infoLabels={'Genre': 'Doku', "Title": name, "Plot": desc, "Duration": duration})
     item.setProperty('IsPlayable', 'true')
     menu = []
-    menu.append(('Download Video', 'XBMC.RunPlugin(%s?mode=59&name=%s&url=%s)' % (sys.argv[0], name, url)))
     item.addContextMenuItems(items=menu, replaceItems=False)
     item.setProperty('fanart_image', fanart)
     xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
@@ -281,12 +248,6 @@ elif mode == 'Alphabet':
     Alphabet()
 elif mode == 'getcat':
     getcat()
-elif mode == 'listing':
-    listing()
-elif mode == 'play1':
-    play1(url)
-elif mode == '59':
-    Download(url)
 else:
     categories()
 
