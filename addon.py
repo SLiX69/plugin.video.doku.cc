@@ -52,6 +52,8 @@ def categories():
     if show_menu_search == 'true': addDir('Suche', '', 'Search', imageDir + '6.png')
     if show_menu_cats == 'true': addDir('Kategorien', '', 'getcat', imageDir + '7.png')
     if show_menu_abc == 'true': addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
+    if script_chk('plugin.video.bookmark') == 1:
+        addDir('Merkliste', '', 'merk', imageDir + '9.png')
     xbmcplugin.endOfDirectory(pluginhandle)
     if change_view:
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
@@ -94,7 +96,7 @@ def index(url):
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
         vote = get_item_vote(item['voting']['voteCountAll'])
-        desc = '%s       %s  bei  %s \n%s\n%s' % (
+        desc = '%s      %s  bei  %s\n%s\n%s' % (
         date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
@@ -198,6 +200,10 @@ def getjson(url):
     return data
 
 
+def script_chk(script_name):
+    return xbmc.getCondVisibility('System.HasAddon(%s)' % script_name) == 1
+
+
 def addLink(name, url, mode, iconimage, desc, duration):
     u = sys.argv[0] + "?url=" + quote_plus(url) + "&mode=" + str(mode)
     ok = True
@@ -248,6 +254,11 @@ elif mode == 'Alphabet':
     Alphabet()
 elif mode == 'getcat':
     getcat()
+elif mode == 'merk':
+    xbmc.log('MERK')
+    xbmc.executebuiltin(
+        "XBMC.RunPlugin(\"plugin://plugin.video.bookmark/?mode=episodes&url=plugin.video.doku5.com\")")
+    xbmc.executebuiltin("ActivateWindow(10024,plugin://plugin.video.bookmark/?mode=episodes&url=plugin.video.doku5.com)")
 else:
     categories()
 
