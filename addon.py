@@ -96,7 +96,7 @@ def index(url):
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
         vote = get_item_vote(item['voting']['voteCountAll'])
-        desc = '%s      %s  bei  %s\n%s%s' % (
+        desc = '%s    %s  bei  %s\n%s%s' % (
         date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration)
     try:
