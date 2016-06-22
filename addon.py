@@ -37,6 +37,13 @@ if addon.getSetting('show_menu_month') == 'false': dis_genre.append('Top Dokus d
 if addon.getSetting('show_menu_year') == 'false': dis_genre.append('Top Dokus des Jahres')
 
 
+sett_desc_show_date = False
+sett_desc_show_vote = False
+sett_desc_show_src = False
+if addon.getSetting('desc_show_date') == 'true': sett_desc_show_date = True
+if addon.getSetting('desc_show_vote') == 'true': sett_desc_show_vote = True
+if addon.getSetting('desc_show_src') == 'true': sett_desc_show_src = True
+
 def categories():
     genres = get_genres()
     for genre in genres:
@@ -92,8 +99,7 @@ def index(url):
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
         vote = get_item_vote(item['voting']['voteCountAll'])
-        desc = '%s    %s  bei  %s\n%s%s' % (
-        date, perc, vote, source, desc)
+        desc = getdesc(date, perc, vote, source, desc)
         addLink(name, url, 'play', thumb, desc, duration, date)
     try:
         url = (data['query']['nextpage'])
@@ -155,7 +161,7 @@ def get_item_src(source):
         if source.upper() != 'PROGRAMM' and len(source) > 2:
             if len(source) > 15:
                 source = source[0:14]
-            source = 'von: ' + source + '\n'
+            source = 'von: ' + source
         else:
             source = ''
     else:
@@ -175,13 +181,11 @@ def get_item_perc(perc):
 
 def get_item_vote(vote):
     if vote == 1:
-        vote = str(vote) + '    Vote  '
+        vote = str(vote) + '   Vote  '
     elif vote < 10:
-        vote = str(vote) + '    Votes'
-    elif vote != 100:
-        vote = str(vote) + '  Votes'
+        vote = str(vote) + '   Votes'
     else:
-        vote = str(vote) + 'Votes'
+        vote = str(vote) + '  Votes'
     return vote
 
 
@@ -190,6 +194,19 @@ def getjson(url):
     data = r.json()
     r.connection.close()
     return data
+
+
+def getdesc(date, perc, vote, source, description):
+    desc = ''
+    if sett_desc_show_date: desc = date + '   '
+    if sett_desc_show_vote: desc += vote + '  ' + perc + '   '
+    if sett_desc_show_src and source != '': desc += source
+
+    if sett_desc_show_date or sett_desc_show_vote or sett_desc_show_src and source != '':
+        desc += '\n'
+
+    desc = desc + description
+    return desc
 
 
 def script_chk(script_name):
