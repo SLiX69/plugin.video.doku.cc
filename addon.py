@@ -94,7 +94,7 @@ def index(url):
         vote = get_item_vote(item['voting']['voteCountAll'])
         desc = '%s    %s  bei  %s\n%s%s' % (
         date, perc, vote, source, desc)
-        addLink(name, url, 'play', thumb, desc, duration)
+        addLink(name, url, 'play', thumb, desc, duration, date)
     try:
         url = (data['query']['nextpage'])
         addDir('Next', url, 'index', imageDir + '10.png')
@@ -200,11 +200,11 @@ def script_chk(script_name):
     return xbmc.getCondVisibility('System.HasAddon(%s)' % script_name) == 1
 
 
-def addLink(name, url, mode, iconimage, desc, duration):
+def addLink(name, url, mode, iconimage, desc, duration, date):
     u = sys.argv[0] + "?url=" + quote_plus(url) + "&mode=" + str(mode)
     ok = True
     item = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
-    item.setInfo(type="Video", infoLabels={'Genre': 'Doku', "Title": name, "Plot": desc, "Duration": duration})
+    item.setInfo(type="Video", infoLabels={'Genre': 'Doku', "Title": name, "Plot": desc, "Duration": duration, "aired": date})
     item.setProperty('IsPlayable', 'true')
     menu = []
     item.addContextMenuItems(items=menu, replaceItems=False)
