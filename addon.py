@@ -117,7 +117,7 @@ def index(url):
 
 def play(url):
     try:
-        video_url = "plugin://plugin.video.youtube/?path=/root/video&action=play_video&videoid="+url
+        video_url = "plugin://plugin.video.youtube/play/?video_id="+url
         listitem = xbmcgui.ListItem(path=video_url)
         xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
     except ValueError:
