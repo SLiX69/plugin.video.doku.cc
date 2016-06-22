@@ -112,13 +112,9 @@ def index(url):
 
 
 def play(url):
-    try:
-        video_url = "plugin://plugin.video.youtube/play/?video_id="+url
-        listitem = xbmcgui.ListItem(path=video_url)
-        xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
-    except ValueError:
-        pass
-        # xbmc.executebuiltin("XBMC.Notification(%s, Video not available!, 2000, %s)" % (title, icon))
+    video_url = "plugin://plugin.video.youtube/play/?video_id="+url
+    listitem = xbmcgui.ListItem(path=video_url)
+    xbmcplugin.setResolvedUrl(pluginhandle, succeeded=True, listitem=listitem)
 
 
 def Search():
