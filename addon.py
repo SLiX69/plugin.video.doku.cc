@@ -1,11 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import re, xbmcplugin, xbmcgui, requests
-import xbmc
-import xbmcaddon
-import os
-import urlparse
+import os, re, urlparse, requests
+import xbmc, xbmcgui, xbmcaddon, xbmcplugin
 from urllib import quote, unquote_plus, unquote, urlencode, quote_plus, urlretrieve
 
 
@@ -52,8 +49,7 @@ def categories():
     if show_menu_search == 'true': addDir('Suche', '', 'Search', imageDir + '6.png')
     if show_menu_cats == 'true': addDir('Kategorien', '', 'getcat', imageDir + '7.png')
     if show_menu_abc == 'true': addDir('A-Z', '', 'Alphabet', imageDir + '8.png')
-    if script_chk('plugin.video.bookmark') == 1:
-        addDir('Merkliste', '', 'merk', imageDir + '9.png')
+    if script_chk('plugin.video.bookmark') == 1: addDir('Merkliste', '', 'merk', imageDir + '9.png')
     xbmcplugin.endOfDirectory(pluginhandle)
     if change_view:
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
