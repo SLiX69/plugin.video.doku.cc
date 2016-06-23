@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="Allgemein">
-		<setting label="Zeige Doku5 Fanart" type="bool" id="show_logo_fanart" default="true"/>
-		<setting label="Zeige Episoden Fanart (nicht immer vorhanden)" type="bool" id="show_doku_fanart" default="true"/>
+		<setting label="Doku5 Fanart" type="bool" id="show_logo_fanart" default="true"/>
+		<setting label="Episoden Fanart (nicht immer vorhanden)" type="bool" id="show_doku_fanart" default="true"/>
+		<setting label="Fanart Fallback (schlechte Fanart statt keiner - erhöhte Ladezeit)" type="bool" id="show_doku_fanart_fallback" enable="eq(-1,true)" default="false"/>
 		<setting label="Zeige 'Hauptmenü' in Episoden" type="bool" id="show_main_menu_folder" default="true"/>
 		<setting type="sep"/>
 		<setting label="Ändere ViewID" type="bool" id="change_view" default="false"/>
 		<setting label="ViewID Episoden" type="number" id="change_view_episodes" enable="eq(-1,true)" default="503"/>
 	</category>
-	<category label="Menü">
+	<category label="Hauptmenü">
 		<setting label="Zeige 'Die neuesten Dokus'" type="bool" id="show_menu_new" default="true"/>
 		<setting label="Zeige 'Die neuesten reUploads'" type="bool" id="show_menu_reup" default="true"/>
 		<setting label="Zeige 'Aufsteiger der Woche'" type="bool" id="show_menu_week" default="true"/>
@@ -17,11 +18,10 @@
 		<setting label="Zeige 'Suche'" type="bool" id="show_menu_search" default="true"/>
 		<setting label="Zeige 'Kategorien'" type="bool" id="show_menu_cats" default="true"/>
 		<setting label="Zeige 'A-Z'" type="bool" id="show_menu_abc" default="true"/>
-		<setting label="Zeige 'meine Downloads'" type="bool" id="show_menu_dl" default="false"/>
 	</category>
 		<category label="Description">
-		<setting label="Zeige 'Datum' in Beschreibung" type="bool" id="desc_show_date" default="true"/>
-		<setting label="Zeige 'Votes' in Beschreibung" type="bool" id="desc_show_vote" default="true"/>
-		<setting label="Zeige 'Quelle' in Beschreibung" type="bool" id="desc_show_src" default="true"/>
+		<setting label="Datum in Beschreibung" type="bool" id="desc_show_date" default="true"/>
+		<setting label="Votes in Beschreibung" type="bool" id="desc_show_vote" default="true"/>
+		<setting label="Quelle in Beschreibung" type="bool" id="desc_show_src" default="true"/>
 	</category>
 </settings>
