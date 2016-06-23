@@ -162,7 +162,7 @@ def cleandate(date):
 
 
 def get_item_src(source):
-    if show_doku_src == 'true':
+    if sett_desc_show_src:
         if source.upper() != 'PROGRAMM' and len(source) > 2:
             if len(source) > 15:
                 source = source[0:14]
@@ -209,8 +209,7 @@ def getdesc(date, perc, vote, source, description):
 
     if sett_desc_show_date or sett_desc_show_vote or sett_desc_show_src and source != '':
         desc += '\n'
-
-    desc = desc + description
+    desc += description
     return desc
 
 
