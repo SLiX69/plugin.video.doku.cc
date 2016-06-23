@@ -22,8 +22,12 @@ show_menu_abc = addon.getSetting('show_menu_abc')
 xbmcplugin.setContent(pluginhandle, 'Episodes')
 baseurl = 'http://doku5.com//api.php?'
 change_view = False
+sett_show_logo_fanart = False
+sett_show_doku_fanart = False
 
-if addon.getSetting('show_doku_fanart') == 'false': fanart = 'fanart' + 'dis'
+if addon.getSetting('show_logo_fanart') == 'true': sett_show_logo_fanart = True
+if not sett_show_logo_fanart: fanart = 'fanart' + 'dis'
+if addon.getSetting('show_doku_fanart') == 'true': sett_show_doku_fanart = True
 if addon.getSetting('show_main_menu_folder') == 'true': show_mm = True
 if addon.getSetting('change_view') == 'true':
     change_view = True
@@ -36,13 +40,13 @@ if addon.getSetting('show_menu_week') == 'false': dis_genre.append('Aufsteiger d
 if addon.getSetting('show_menu_month') == 'false': dis_genre.append('Top Dokus des Monats')
 if addon.getSetting('show_menu_year') == 'false': dis_genre.append('Top Dokus des Jahres')
 
-
 sett_desc_show_date = False
 sett_desc_show_vote = False
 sett_desc_show_src = False
 if addon.getSetting('desc_show_date') == 'true': sett_desc_show_date = True
 if addon.getSetting('desc_show_vote') == 'true': sett_desc_show_vote = True
 if addon.getSetting('desc_show_src') == 'true': sett_desc_show_src = True
+
 
 def categories():
     genres = get_genres()
@@ -94,6 +98,7 @@ def index(url):
         desc = item['description']
         name = item['title']
         thumb = item['cover']
+        #thumb = 'http://img.youtube.com/vi/' + url + '/0.jpg'
         duration = item['length']
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
@@ -221,6 +226,7 @@ def addLink(name, url, mode, iconimage, desc, duration, date):
     item.setProperty('IsPlayable', 'true')
     menu = []
     item.addContextMenuItems(items=menu, replaceItems=False)
+    if sett_show_doku_fanart: fanart = 'http://img.youtube.com/vi/' + url + '/maxresdefault.jpg'
     item.setProperty('fanart_image', fanart)
     xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     xbmcplugin.addDirectoryItem(pluginhandle, url=u, listitem=item)
