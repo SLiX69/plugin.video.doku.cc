@@ -24,10 +24,13 @@ baseurl = 'http://doku5.com//api.php?'
 change_view = False
 sett_show_logo_fanart = False
 sett_show_doku_fanart = False
+sett_show_doku_fanart_fallback = False
 
 if addon.getSetting('show_logo_fanart') == 'true': sett_show_logo_fanart = True
 if not sett_show_logo_fanart: fanart = 'fanart' + 'dis'
 if addon.getSetting('show_doku_fanart') == 'true': sett_show_doku_fanart = True
+if addon.getSetting('show_doku_fanart_fallback') == 'true': sett_show_doku_fanart_fallback = True
+
 if addon.getSetting('show_main_menu_folder') == 'true': show_mm = True
 if addon.getSetting('change_view') == 'true':
     change_view = True
@@ -99,13 +102,14 @@ def index(url):
         name = item['title']
         thumb = item['cover']
         #thumb = 'http://img.youtube.com/vi/' + url + '/0.jpg'
+        fanart = get_fanart(url)
         duration = item['length']
         date = cleandate(item['date'])
         source = get_item_src(item['dokuSrc'])
         perc = get_item_perc(item['voting']['voteCountInPerc'])
         vote = get_item_vote(item['voting']['voteCountAll'])
         desc = getdesc(date, perc, vote, source, desc)
-        addLink(name, url, 'play', thumb, desc, duration, date)
+        addLink(name, url, 'play', thumb, desc, duration, date, fanart)
     try:
         url = (data['query']['nextpage'])
         addDir('Next', url, 'index', imageDir + '10.png')
@@ -213,11 +217,29 @@ def getdesc(date, perc, vote, source, description):
     return desc
 
 
+def get_fanart(yt_id):
+    fanart = ''
+    if sett_show_logo_fanart:
+        fanart = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
+    if sett_show_doku_fanart:
+        fanart = 'http://img.youtube.com/vi/' + yt_id + '/maxresdefault.jpg'
+        if sett_show_doku_fanart_fallback:
+            if not exists(fanart):
+                fanart = 'http://img.youtube.com/vi/' + yt_id + '/hqdefault.jpg'
+
+    return fanart
+
+
+def exists(path):
+    r = requests.head(path)
+    return r.status_code == requests.codes.ok
+
+
 def script_chk(script_name):
     return xbmc.getCondVisibility('System.HasAddon(%s)' % script_name) == 1
 
 
-def addLink(name, url, mode, iconimage, desc, duration, date):
+def addLink(name, url, mode, iconimage, desc, duration, date, fanart):
     u = sys.argv[0] + "?url=" + quote_plus(url) + "&mode=" + str(mode)
     ok = True
     item = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
@@ -225,7 +247,6 @@ def addLink(name, url, mode, iconimage, desc, duration, date):
     item.setProperty('IsPlayable', 'true')
     menu = []
     item.addContextMenuItems(items=menu, replaceItems=False)
-    if sett_show_doku_fanart: fanart = 'http://img.youtube.com/vi/' + url + '/maxresdefault.jpg'
     item.setProperty('fanart_image', fanart)
     xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     xbmcplugin.addDirectoryItem(pluginhandle, url=u, listitem=item)
