@@ -118,12 +118,12 @@ def index(url):
     try:
         url = (data['query']['prevpage'])
         addDir('Prev', url, 'index', imageDir + '11.png')
-        if show_mm: addDir('Hauptmenü', '', '', '')
+        if show_mm: addDir('Hauptmenü', '', '', imageDir + '12.png')
     except:
         pass
-    xbmcplugin.endOfDirectory(pluginhandle)
     if change_view:
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
+    xbmcplugin.endOfDirectory(pluginhandle)
 
 
 def play(url):
@@ -226,7 +226,6 @@ def get_fanart(yt_id):
         if sett_show_doku_fanart_fallback:
             if not exists(fanart):
                 fanart = 'http://img.youtube.com/vi/' + yt_id + '/hqdefault.jpg'
-
     return fanart
 
 
@@ -243,12 +242,12 @@ def addLink(name, url, mode, iconimage, desc, duration, date, fanart):
     u = sys.argv[0] + "?url=" + quote_plus(url) + "&mode=" + str(mode)
     ok = True
     item = xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
-    item.setInfo(type="Video", infoLabels={'Genre': 'Doku', "Title": name, "Plot": desc, "Duration": duration, "aired": date})
+    item.setInfo(type="Video", infoLabels={'genre': 'Doku', "title": name, "plot": desc, "duration": duration, "aired": date})
     item.setProperty('IsPlayable', 'true')
     menu = []
     item.addContextMenuItems(items=menu, replaceItems=False)
     item.setProperty('fanart_image', fanart)
-    xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
+    #xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     xbmcplugin.addDirectoryItem(pluginhandle, url=u, listitem=item)
 
 
@@ -258,6 +257,7 @@ def addDir(name, url, mode, iconimage):
     item = xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=iconimage)
     item.setInfo(type="Video", infoLabels={"Title": name})
     item.setProperty('fanart_image', fanart)
+    #xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     xbmcplugin.addDirectoryItem(pluginhandle, url=u, listitem=item, isFolder=True)
 
 
