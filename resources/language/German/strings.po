@@ -1,0 +1,160 @@
+# Kodi Media Center language file
+# Addon Name: Version Check
+# Addon id: service.xbmc.versioncheck
+# Addon Provider: XBMC Foundation
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30010"
+msgid "Latest Documentaries"
+msgstr "Die neuesten Dokus"
+
+msgctxt "#30011"
+msgid "Reuploaded Documentaries"
+msgstr "Die neuesten reUploads"
+
+msgctxt "#30012"
+msgid "Top of the week"
+msgstr "Aufsteiger der Woche"
+
+msgctxt "#30013"
+msgid "Top of the month"
+msgstr "Top Dokus des Monats"
+
+msgctxt "#30014"
+msgid "Top of the year"
+msgstr "Top Dokus des Jahres"
+
+msgctxt "#30015"
+msgid "Search"
+msgstr "Suche"
+
+msgctxt "#30016"
+msgid "Categories"
+msgstr "Kategorien"
+
+msgctxt "#30017"
+msgid "A-Z"
+msgstr "A-Z"
+
+msgctxt "#30018"
+msgid "Bookmarks"
+msgstr "Merkliste"
+
+#empty strings
+
+msgctxt "#30030"
+msgid "Next"
+msgstr "Next"
+
+msgctxt "#30031"
+msgid "Prev"
+msgstr "Prev"
+
+msgctxt "#30032"
+msgid "Main menu"
+msgstr "Hauptmenü"
+
+#empty strings
+
+msgctxt "#30040"
+msgid "Search on Doku5"
+msgstr "Suche auf Doku5"
+
+#empty strings
+
+msgctxt "#30043"
+msgid "by: "
+msgstr "von: "
+
+#empty strings
+#SETTINGS
+
+msgctxt "#30071"
+msgid "General"
+msgstr "Allgemein"
+
+msgctxt "#30072"
+msgid "Menu"
+msgstr "Menü"
+
+msgctxt "#30073"
+msgid "Description"
+msgstr "Beschreibung"
+
+#empty strings id 30075 - 30081
+
+msgctxt "#30075"
+msgid "Doku5 fanart"
+msgstr "Doku5 Fanart"
+
+msgctxt "#30076"
+msgid "Episode fanart (sometimes missing)"
+msgstr "Episoden Fanart (nicht immer vorhanden)"
+
+msgctxt "#30077"
+msgid "Fanart fallback (bad quality instead of none, increases load time)"
+msgstr "Fanart Fallback (schlechte Fanart statt keiner - erhöhte Ladezeit)"
+
+msgctxt "#30078"
+msgid "Show 'main menu' in episodes"
+msgstr "Zeige 'Hauptmenü' in Episoden"
+
+#empty strings 
+
+msgctxt "#30081"
+msgid "Show 'Latest Documentaries'"
+msgstr "Zeige 'Die neuesten Dokus'"
+
+msgctxt "#30082"
+msgid "Show 'Reuploaded Documentaries'"
+msgstr "Zeige 'Die neuesten reUploads'"
+
+msgctxt "#30083"
+msgid "Show 'Top of the week'"
+msgstr "Zeige 'Aufsteiger der Woche'"
+
+msgctxt "#30084"
+msgid "Show 'Top of the month'"
+msgstr "Zeige 'Top Dokus des Monats'"
+
+msgctxt "#30085"
+msgid "Show 'Top of the year'"
+msgstr "Zeige 'Top Dokus des Jahres'"
+
+msgctxt "#30086"
+msgid "Show 'Search'"
+msgstr "Zeige 'Suche'"
+
+msgctxt "#30087"
+msgid "Show 'Categories'"
+msgstr "Zeige 'Kategorien'"
+
+msgctxt "#30088"
+msgid "Show 'A-Z'"
+msgstr "Zeige 'A-Z'"
+
+#empty strings
+
+msgctxt "#30091"
+msgid "Date in description"
+msgstr "Datum in Beschreibung"
+
+msgctxt "#30092"
+msgid "Votes in description"
+msgstr "Votes in Beschreibung"
+
+msgctxt "#30093"
+msgid "Source in description"
+msgstr "Quelle in Beschreibung"
