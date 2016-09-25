@@ -1,9 +1,8 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os, re, urlparse, requests
+import os, requests
 import xbmc, xbmcgui, xbmcaddon, xbmcplugin
-from urllib import quote, unquote_plus, unquote, urlencode, quote_plus, urlretrieve
+from urllib import unquote_plus, unquote, quote_plus
 
 
 pluginhandle = int(sys.argv[1])
