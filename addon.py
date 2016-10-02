@@ -56,7 +56,7 @@ def main():
 def search():
     search_entered = search_dialog()
     url = '%ssearch=%s&page=1' % (baseurl, search_entered)
-    index(url, True)
+    index(url)
 
 
 def search_dialog():
@@ -78,7 +78,7 @@ def get_cat():
         name = item['name']
         url = item['url']
         items.append({
-            "name": name, "url": url, "mode": "index_a", "type": "dir",
+            "name": name, "url": url, "mode": "index", "type": "dir",
             "infolabels": {"title": name},
             "images": {"thumb": icon, "fanart": fanart}})
         #addDir(name, url, 'index', icon)
@@ -101,7 +101,7 @@ def list_alphabet():
     xbmcplugin.endOfDirectory(pluginhandle)
 
 
-def index(url, check=False):    # temp fix pages
+def index(url):
     items = []
     data = get_json(url)
     for item in data['dokus']:
@@ -122,15 +122,12 @@ def index(url, check=False):    # temp fix pages
             "duration": duration, "aired": date}, "images": {"thumb": thumb, "fanart": fanart}})
     if 'nextpage' in data['query']:
         url = (data['query']['nextpage'])
-        data_next_page = {}
-        if check:
-            data_next_page = get_json(url)
-        if data_next_page.get('dokus') != data['dokus']:
-            name = TRANSLATE(30030)
-            #addDir(TRANSLATE(30030), url, 'index', imageDir + '10.png')
-            items.append({
-                "name": name, "url": url, "mode": "index", "type": "dir", "infolabels": {"title": name},
-                "images": {"thumb": imageDir + '10.png'}})
+        name = TRANSLATE(30030)
+        #addDir(TRANSLATE(30030), url, 'index', imageDir + '10.png')
+        items.append({
+            "name": name, "url": url, "mode": "index", "type": "dir", "infolabels": {"title": name},
+            "images": {"thumb": imageDir + '10.png'}})
+
     if 'prevpage' in data['query']:
         url = (data['query']['prevpage'])
         name = TRANSLATE(30031)
@@ -244,8 +241,6 @@ if type(url) == type(str()):
 
 if mode == 'index':
     index(url)
-elif mode == 'index_a':
-    index(url, True)
 elif mode == 'play':
     play(url)
 elif mode == 'Search':
