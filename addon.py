@@ -54,20 +54,13 @@ def main():
 
 
 def search():
-    search_entered = search_dialog()
-    url = '%ssearch=%s&page=1' % (baseurl, search_entered)
+    dialog = xbmcgui.Dialog()
+    term = dialog.input(TRANSLATE(30040), type=xbmcgui.INPUT_ALPHANUM)
+    # if user cancels, return
+    if not term:
+        return -1
+    url = '%ssearch=%s&page=1' % (baseurl, term)
     index(url)
-
-
-def search_dialog():
-    search_entered = ''
-    keyboard = xbmc.Keyboard(search_entered, TRANSLATE(30040))
-    keyboard.doModal()
-    if keyboard.isConfirmed():
-        search_entered = keyboard.getText()
-        if search_entered == None:
-            return False
-    return search_entered
 
 
 def get_cat():
