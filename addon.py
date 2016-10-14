@@ -106,17 +106,19 @@ def index(url):
         duration = item['length']
         date = clean_date(item['date'])
         source = get_item_src(item['dokuSrc'])
-        perc = get_item_perc(item['voting']['voteCountInPerc'])
-        vote = get_item_vote(item['voting']['voteCountAll'])
+        perc_raw = item['voting']['voteCountInPerc']
+        perc = get_item_perc(perc_raw)
+        vote_raw = item['voting']['voteCountAll']
+        vote = get_item_vote(vote_raw)
         desc = get_desc(date, perc, vote, source, desc)
-        #addLink(name, url, 'play', thumb, desc, duration, date, fanart)
         items.append({
             "name": name, "url": url, "mode": "play", "type": "video", "infolabels": {"title": name, "plot": desc,
-            "duration": duration, "aired": date}, "images": {"thumb": thumb, "fanart": fanart}})
+            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10)},
+            "images": {"thumb": thumb, "fanart": fanart}})
+        
     if 'nextpage' in data['query']:
         url = (data['query']['nextpage'])
         name = TRANSLATE(30030)
-        #addDir(TRANSLATE(30030), url, 'index', imageDir + '10.png')
         items.append({
             "name": name, "url": url, "mode": "index", "type": "dir", "infolabels": {"title": name},
             "images": {"thumb": imageDir + '10.png'}})
@@ -127,7 +129,6 @@ def index(url):
         items.append({
             "name": name, "url": url, "mode": "index", "type": "dir", "infolabels": {"title": name},
             "images": {"thumb": imageDir + '11.png'}})
-        #addDir(TRANSLATE(30031), url, 'index', imageDir + '11.png')
         if show_mm:
             name = TRANSLATE(30032)
             items.append({
@@ -224,6 +225,7 @@ def play(url):
 
 def set_view():
     if change_view:
+        #TODO short sleep
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 params = parameters_string_to_dict(sys.argv[2])
