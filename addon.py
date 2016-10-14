@@ -104,8 +104,10 @@ def index(url):
         thumb = item['cover']
         fanart = get_fanart(url)
         duration = item['length']
-        date = clean_date(item['date'])
-        source = get_item_src(item['dokuSrc'])
+        date_raw = item['date']
+        date = clean_date(date_raw)
+        source_raw = item['dokuSrc']
+        source = get_item_src(source_raw)
         perc_raw = item['voting']['voteCountInPerc']
         perc = get_item_perc(perc_raw)
         vote_raw = item['voting']['voteCountAll']
@@ -113,9 +115,9 @@ def index(url):
         desc = get_desc(date, perc, vote, source, desc)
         items.append({
             "name": name, "url": url, "mode": "play", "type": "video", "infolabels": {"title": name, "plot": desc,
-            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10)},
+            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source_raw, "dateadded": date_raw},
             "images": {"thumb": thumb, "fanart": fanart}})
-        
+
     if 'nextpage' in data['query']:
         url = (data['query']['nextpage'])
         name = TRANSLATE(30030)
