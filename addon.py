@@ -106,16 +106,18 @@ def index(url):
         duration = item['length']
         date_raw = item['date']
         date = clean_date(date_raw)
-        source_raw = item['dokuSrc']
-        source = get_item_src(source_raw)
+        source = get_item_src(item['dokuSrc'])
+        source_desc = "%s%s" % (TRANSLATE(30043), source[:9])
+        if source == '':
+            source_desc = ''
         perc_raw = item['voting']['voteCountInPerc']
         perc = get_item_perc(perc_raw)
         vote_raw = item['voting']['voteCountAll']
         vote = get_item_vote(vote_raw)
-        desc = get_desc(date, perc, vote, source, desc)
+        desc = get_desc(date, perc, vote, source_desc, desc)
         items.append({
             "name": name, "url": url, "mode": "play", "type": "video", "infolabels": {"title": name, "plot": desc,
-            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source_raw, "dateadded": date_raw},
+            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source},
             "images": {"thumb": thumb, "fanart": fanart}})
 
     if 'nextpage' in data['query']:
@@ -149,17 +151,12 @@ def clean_date(date):
 
 def get_item_src(source):
     if sett_desc_show_src:
-        if source.startswith('WWW1.'):
+        if source.startswith('WWW1.') or source.startswith("INFO."):
             source = source[5:]
-            pass
-        if source.upper() != 'PROGRAMM' and len(source) > 2:
-            if len(source) > 10:
-                source = source[:9]
-            source = TRANSLATE(30043) + source
-        else:
+        if source.startswith('DASERSTE'):
+            source = "ARD"
+        if source.upper() == 'PROGRAMM':
             source = ''
-    else:
-        source = ''
     return source
 
 
