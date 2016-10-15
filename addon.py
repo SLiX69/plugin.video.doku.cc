@@ -153,8 +153,8 @@ def get_item_src(source):
             source = source[5:]
             pass
         if source.upper() != 'PROGRAMM' and len(source) > 2:
-            if len(source) > 15:
-                source = source[0:14]
+            if len(source) > 10:
+                source = source[:9]
             source = TRANSLATE(30043) + source
         else:
             source = ''
