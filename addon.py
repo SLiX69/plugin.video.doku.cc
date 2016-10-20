@@ -117,7 +117,8 @@ def index(url):
         desc = get_desc(date, perc, vote, source_desc, desc)
         items.append({
             "name": name, "url": url, "mode": "play", "type": "video", "infolabels": {"title": name, "plot": desc,
-            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source},
+            "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source,
+            "year": date[-4:], "genre": "Doku"},
             "images": {"thumb": thumb, "fanart": fanart}})
 
     if 'nextpage' in data['query']:
@@ -225,6 +226,7 @@ def play(url):
 def set_view():
     if change_view:
         #TODO short sleep
+        xbmc.sleep(100)
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 params = parameters_string_to_dict(sys.argv[2])
