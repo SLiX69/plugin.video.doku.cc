@@ -79,6 +79,23 @@ msgid "by: "
 msgstr "von: "
 
 #empty strings
+
+msgctxt "#30054"
+msgid "Gefällt mir"
+msgstr "Like"
+
+msgctxt "#30055"
+msgid "Gefällt mir nicht"
+msgstr "Dislike"
+
+#empty strings
+
+msgctxt "#30060"
+msgid "Du hast dies bereits bewertet!"
+msgstr "You already voted this!"
+
+#empty strings
+
 #SETTINGS
 
 msgctxt "#30071"
@@ -93,7 +110,7 @@ msgctxt "#30073"
 msgid "Description"
 msgstr "Beschreibung"
 
-#empty strings id 30075 - 30081
+#empty strings 
 
 msgctxt "#30075"
 msgid "Doku5 fanart"

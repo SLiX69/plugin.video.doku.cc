@@ -12,10 +12,11 @@ def add_entries(entries_list):
     entries = []
     is_folder = False
     for entry in entries_list:
-        xbmc.log(str(entry))
+        #xbmc.log(str(entry))
         entry_name = entry['name']
         item = xbmcgui.ListItem(entry_name)
         item.setArt(entry.get('images'))
+        item.addContextMenuItems(entry.get('cm', []))
         entry_url = get_entry_url(entry)
         info_labels = entry.get('infolabels')
         if entry['type'] == 'video':
@@ -32,7 +33,7 @@ def add_entries(entries_list):
 def get_entry_url(entry_dict):
     entry_url = sys.argv[0] + '?'
     for param in entry_dict:
-        if not isinstance(entry_dict[param], dict) and str(param != 'desc'):
+        if not isinstance(entry_dict[param], dict) and not isinstance(entry_dict[param], list) and str(param != 'desc'):
             if isinstance(entry_dict[param], unicode):
                 entry_dict[param] = entry_dict[param].encode("UTF-8")
             entry_url += "%s=%s&" % (param, quote_plus(entry_dict[param]))

@@ -79,6 +79,23 @@ msgid "by: "
 msgstr ""
 
 #empty strings
+
+msgctxt "#30054"
+msgid "Like"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Dislike"
+msgstr ""
+
+#empty strings
+
+msgctxt "#30060"
+msgid "You already voted this!"
+msgstr ""
+
+#empty strings
+
 #SETTINGS
 
 msgctxt "#30071"

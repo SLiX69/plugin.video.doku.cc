@@ -6,6 +6,7 @@ from urllib import unquote_plus
 
 from resources.lib.menus import get_main_menu
 from resources.lib.listing import add_entries, parameters_string_to_dict
+from resources.lib.voting import vote_up, vote_down, vote_neut
 
 
 pluginhandle = int(sys.argv[1])
@@ -97,7 +98,9 @@ def list_alphabet():
 def index(url):
     items = []
     data = get_json(url)
+    nonce = data['nonce']
     for item in data['dokus']:
+        dokuId = item['dokuId']
         url = item['youtubeId']
         desc = item['description']
         name = item['title']
@@ -114,12 +117,15 @@ def index(url):
         perc = get_item_perc(perc_raw)
         vote_raw = item['voting']['voteCountAll']
         vote = get_item_vote(vote_raw)
+        cm = [(TRANSLATE(30054), 'XBMC.RunPlugin(%s?mode=vote_up&url=%s-%s)' % (sys.argv[0], dokuId, nonce)),
+              (TRANSLATE(30055), 'XBMC.RunPlugin(%s?mode=vote_down&url=%s-%s)' % (sys.argv[0], dokuId, nonce))]
         desc = get_desc(date, perc, vote, source_desc, desc)
         items.append({
             "name": name, "url": url, "mode": "play", "type": "video", "infolabels": {"title": name, "plot": desc,
             "duration": duration, "aired": date, "votes": vote_raw, "rating": (float(perc_raw) / 10), "studio": source,
             "year": date[-4:], "genre": "Doku"},
-            "images": {"thumb": thumb, "fanart": fanart}})
+            "images": {"thumb": thumb, "fanart": fanart},
+            "cm": cm})
 
     if 'nextpage' in data['query']:
         url = (data['query']['nextpage'])
@@ -217,6 +223,20 @@ def exists(path):
     return r.status_code == requests.codes.ok
 
 
+def vote(mode, url):
+    vote = 0
+    url = url.split("-")
+    if mode == 'vote_up':
+        vote = vote_up(url[0], url[1])
+    elif mode == 'vote_down':
+        vote = vote_down(url[0], url[1])
+    if vote == -1:
+        dialog = xbmcgui.Dialog()
+        dialog.notification(title, TRANSLATE(30060), icon, 2000)
+    else:
+        xbmc.executebuiltin("Container.Refresh")
+
+
 def play(url):
     video_url = "plugin://plugin.video.youtube/play/?video_id="+url
     listitem = xbmcgui.ListItem(path=video_url)
@@ -245,8 +265,11 @@ elif mode == 'Alphabet':
     list_alphabet()
 elif mode == 'getcat':
     get_cat()
+elif mode == 'vote_up' or mode == 'vote_down':
+    vote(mode, url)
 elif mode == 'merk':
-    xbmc.executebuiltin("ActivateWindow(10024,plugin://plugin.video.bookmark/?mode=episodes&url=plugin.video.doku5.com)")
+    xbmc.executebuiltin(
+        "ActivateWindow(Videos,plugin://plugin.video.bookmark/?mode=episodes&url=plugin.video.doku5.com)")
 else:
     main()
 
