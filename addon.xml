@@ -9,9 +9,9 @@
 		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en_gb">German Documentary Addon</summary>
-		<summary lang="de_de">Die größte Doku-Mediathek im Netz</summary>
-		<description lang="de_de">Über 15.000 Dokumentationen, Dokumentafilme, Reportagen und Voträge in voller Länge.</description>
+		<summary>Die größte Doku-Mediathek im Netz</summary>
+		<description>Über 15.000 Dokumentationen, Dokumentafilme, Reportagen und Voträge in voller Länge.</description>
+		<summary></summary>
 		<platform>all</platform>
 		<license>GNU General Public License v3</license>
 		<forum></forum>
