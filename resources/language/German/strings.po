@@ -81,18 +81,18 @@ msgstr "von: "
 #empty strings
 
 msgctxt "#30054"
-msgid "Gefällt mir"
-msgstr "Like"
+msgid "Like"
+msgstr "Gefällt mir"
 
 msgctxt "#30055"
-msgid "Gefällt mir nicht"
-msgstr "Dislike"
+msgid "Dislike"
+msgstr "Gefällt mir nicht"
 
 #empty strings
 
 msgctxt "#30060"
-msgid "Du hast dies bereits bewertet!"
-msgstr "You already voted this!"
+msgid "You already voted this!"
+msgstr "Du hast dies bereits bewertet!"
 
 #empty strings
 
