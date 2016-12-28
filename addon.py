@@ -11,18 +11,16 @@ from resources.lib.voting import vote_up, vote_down, vote_neut
 
 pluginhandle = int(sys.argv[1])
 title = 'Doku5'
-addon = xbmcaddon.Addon(id='plugin.video.doku5.com') #
+addon = xbmcaddon.Addon(id='plugin.video.doku5.com')
 home = addon.getAddonInfo('path').decode('utf-8')
 icon = xbmc.translatePath(os.path.join(home, 'icon.png'))
 fanart = xbmc.translatePath(os.path.join(home, 'fanart.jpg'))
-imageDir = os.path.join(home, 'thumbnails') + '/' #
+imageDir = os.path.join(home, 'thumbnails') + '/'
 view_mode_id = int('503')
-TRANSLATE = addon.getLocalizedString #
-
-show_doku_src = addon.getSetting('show_doku_source')
+TRANSLATE = addon.getLocalizedString
 
 xbmcplugin.setContent(pluginhandle, 'Episodes')
-baseurl = 'http://doku5.com//api.php?' #
+baseurl = 'http://doku5.com//api.php?'
 change_view = False
 sett_show_logo_fanart = False
 sett_show_doku_fanart = False
@@ -75,7 +73,6 @@ def get_cat():
             "name": name, "url": url, "mode": "index", "type": "dir",
             "infolabels": {"title": name},
             "images": {"thumb": icon, "fanart": fanart}})
-        #addDir(name, url, 'index', icon)
     add_entries(items)
     set_view()
     xbmcplugin.endOfDirectory(pluginhandle)
@@ -218,8 +215,8 @@ def get_fanart(yt_id):
     return fanart
 
 
-def exists(path):
-    r = requests.head(path)
+def exists(url):
+    r = requests.head(url)
     return r.status_code == requests.codes.ok
 
 
@@ -245,8 +242,7 @@ def play(url):
 
 def set_view():
     if change_view:
-        #TODO short sleep
-        xbmc.sleep(100)
+        #xbmc.sleep(100)
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
 params = parameters_string_to_dict(sys.argv[2])
