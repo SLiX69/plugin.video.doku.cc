@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, requests
+import os, requests, datetime
 import xbmc, xbmcgui, xbmcaddon, xbmcplugin
 from urllib import unquote_plus
 
@@ -86,6 +86,24 @@ def list_alphabet():
         items.append({
             "name": name, "url": url, "mode": "index", "type": "dir",
             "infolabels": {"title": name},
+            "images": {"thumb": icon, "fanart": fanart}})
+    add_entries(items)
+    set_view()
+    xbmcplugin.endOfDirectory(pluginhandle)
+
+
+def list_years():
+    items = [{
+        "name": TRANSLATE(30094), "url": '%stop-dokus=last-year&page=1' % baseurl, "mode": "index", "type": "dir",
+        "infolabels": {"title": TRANSLATE(30094)},
+        "images": {"thumb": icon, "fanart": fanart}}]
+    current_year = datetime.datetime.now().year
+    for i in reversed(range(2012, current_year + 1)):
+        year = str(i)
+        url = '%stop-dokus=year-%s&page=1' % (baseurl, year)
+        items.append({
+            "name": year, "url": url, "mode": "index", "type": "dir",
+            "infolabels": {"title": year},
             "images": {"thumb": icon, "fanart": fanart}})
     add_entries(items)
     set_view()
@@ -259,6 +277,8 @@ elif mode == 'Search':
     search()
 elif mode == 'Alphabet':
     list_alphabet()
+elif mode == 'years':
+    list_years()
 elif mode == 'getcat':
     get_cat()
 elif mode == 'vote_up' or mode == 'vote_down':

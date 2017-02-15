@@ -175,3 +175,7 @@ msgstr ""
 msgctxt "#30093"
 msgid "Source in description"
 msgstr ""
+
+msgctxt "#30094"
+msgid "Last year"
+msgstr ""

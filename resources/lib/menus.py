@@ -72,8 +72,8 @@ def get_main_menu():
     }
     top_year = {
             "name": TRANSLATE(30014),
-            "url": '%stop-dokus=last-year&page=1' % baseurl,
-            "mode": "index",
+            "url": "",
+            "mode": "years",
             "type": "dir",
             "images": {
                 "thumb": imageDir + '5.png',
@@ -128,10 +128,3 @@ def get_main_menu():
             items.remove(i)
     main_menu = items
     return main_menu
-
-
-
-
-
-
-

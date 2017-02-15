@@ -175,3 +175,7 @@ msgstr "Votes in Beschreibung"
 msgctxt "#30093"
 msgid "Source in description"
 msgstr "Quelle in Beschreibung"
+
+msgctxt "#30094"
+msgid "Last year"
+msgstr "Letztes Jahr"
