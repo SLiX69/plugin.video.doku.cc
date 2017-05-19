@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-
-import os, requests, datetime
+import os, sys, requests, datetime
 import xbmc, xbmcgui, xbmcaddon, xbmcplugin
 from urllib import unquote_plus
 
 from resources.lib.menus import get_main_menu
 from resources.lib.listing import add_entries, parameters_string_to_dict
-from resources.lib.voting import vote_up, vote_down, vote_neut
+from resources.lib.voting import vote_up, vote_down
 
 
 pluginhandle = int(sys.argv[1])
@@ -121,7 +120,7 @@ def index(url):
         name = item['title']
         thumb = item['cover']
         fanart = get_fanart(url)
-        duration = item['length']
+        duration = item['length']*60
         date_raw = item['date']
         date = clean_date(date_raw)
         source = get_item_src(item['dokuSrc'])
@@ -288,4 +287,3 @@ elif mode == 'merk':
         "ActivateWindow(Videos,plugin://plugin.video.bookmark/?mode=episodes&url=plugin.video.doku5.com)")
 else:
     main()
-
